@@ -1,0 +1,1 @@
+Project Details can be found here: https://hackaday.io/project/134302-ss-minnow-6502atmega-game-console

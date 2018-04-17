@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GilliganCC", "GilliganCC\GilliganCC.vcxproj", "{DE279CC8-4EEB-4F57-87F4-75C63D8255CB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DE279CC8-4EEB-4F57-87F4-75C63D8255CB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DE279CC8-4EEB-4F57-87F4-75C63D8255CB}.Debug|Win32.Build.0 = Debug|Win32
+		{DE279CC8-4EEB-4F57-87F4-75C63D8255CB}.Release|Win32.ActiveCfg = Release|Win32
+		{DE279CC8-4EEB-4F57-87F4-75C63D8255CB}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
