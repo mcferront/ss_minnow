@@ -30,9 +30,17 @@ http://www.cypress.com/file/42836/download
 http://www.nteinc.com/specs/7400to7499/pdf/nte74S00.pdf
 http://www.mouser.com/ds/2/3/ACO-514121.pdf
 
+parts
+---
+RS232: https://www.digikey.com/products/en/connectors-interconnects/d-sub-connectors/439?k=db9&k=&pkeyword=db9&pv1989=0&pv69=984&FV=ffe001b7&quantity=0&ColumnSort=0&page=1&pageSize=25
+GFX: https://www.digikey.com/products/en?keywords=7830-0000PR
+TX0/RX0: https://www.digikey.com/products/en?keywords=52004-0510
+power: https://www.digikey.com/products/en?keywords=52004-0310
+
+
 
 descriptions
-   
+  
    
 Advice from Chris
    better bypass cap lines
