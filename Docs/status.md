@@ -1,12 +1,15 @@
 next steps
 ----
-   get Island PCB working
+   order connectors
+   hook up connectors
+   start ginger
+   
    Document Ocean pipeline + specs
    Breadboard Mary Ann
    Design Ginger
 
 Codenames:
-   SS Minnor: The console
+   SS Minnow: The console
    
    The Island: Motherboard
       Professor (ATMega): The utility/peripheral/everything chip on The Island
@@ -32,11 +35,10 @@ http://www.mouser.com/ds/2/3/ACO-514121.pdf
 
 parts
 ---
-RS232: https://www.digikey.com/products/en/connectors-interconnects/d-sub-connectors/439?k=db9&k=&pkeyword=db9&pv1989=0&pv69=984&FV=ffe001b7&quantity=0&ColumnSort=0&page=1&pageSize=25
-GFX: https://www.digikey.com/products/en?keywords=7830-0000PR
-TX0/RX0: https://www.digikey.com/products/en?keywords=52004-0510
-power: https://www.digikey.com/products/en?keywords=52004-0310
-
+RS232: https://www.digikey.com/scripts/DkSearch/dksus.dll?Detail&itemSeq=260934583&uq=636620306589871118
+GFX: https://www.digikey.com/scripts/DkSearch/dksus.dll?Detail&itemSeq=260935529&uq=636620308485770689
+RX/TX: https://www.digikey.com/scripts/DkSearch/dksus.dll?Detail&itemSeq=260935232&uq=636620306589881119
+power: https://www.digikey.com/scripts/DkSearch/dksus.dll?Detail&itemSeq=260935383&uq=636620306589881119
 
 
 descriptions
