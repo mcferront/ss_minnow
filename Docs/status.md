@@ -1,8 +1,6 @@
 next steps
 ----
-   order connectors
-   hook up connectors
-   start ginger
+   start mary ann
    
    Document Ocean pipeline + specs
    Breadboard Mary Ann
