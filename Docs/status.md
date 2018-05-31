@@ -2,6 +2,14 @@ next steps
 ----
    start mary ann
    
+   AD724
+      https://www.digikey.com/product-detail/en/analog-devices-inc/AD724JRZ/AD724JRZ-ND/653959
+   VCLK
+      https://www.digikey.com/scripts/DkSearch/dksus.dll?Detail&itemSeq=262437742&uq=636633277738425485
+      need a 17pF capacitor
+   ATMega 162: We should have one
+   CLK: We should have one
+   
    Document Ocean pipeline + specs
    Breadboard Mary Ann
    Design Ginger
@@ -37,6 +45,7 @@ RS232: https://www.digikey.com/scripts/DkSearch/dksus.dll?Detail&itemSeq=2609345
 GFX: https://www.digikey.com/scripts/DkSearch/dksus.dll?Detail&itemSeq=260935529&uq=636620308485770689
 RX/TX: https://www.digikey.com/scripts/DkSearch/dksus.dll?Detail&itemSeq=260935232&uq=636620306589881119
 power: https://www.digikey.com/scripts/DkSearch/dksus.dll?Detail&itemSeq=260935383&uq=636620306589881119
+
 
 
 descriptions
