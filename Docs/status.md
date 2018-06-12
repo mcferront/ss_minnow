@@ -1,19 +1,29 @@
+Mistake 1: gfx port on vsync was wired to clk
+Mistake 2: need a reset pin from prof to gfx
+
+Should VSYNC be held high and HSYNC used for everything?
+   if so we need to modify the 162 code
+
+2*CL - 2*CStray (CStray estimated at 5pf)
+
+Reduce r,g,b to .3mV max
+
 next steps
 ----
-   start mary ann
+   1. mary ann color bars
+      when it works test by sending everything out HSYNC and keeping vsync high
+         this would free a pin
    
-   AD724
-      https://www.digikey.com/product-detail/en/analog-devices-inc/AD724JRZ/AD724JRZ-ND/653959
-   VCLK
-      https://www.digikey.com/scripts/DkSearch/dksus.dll?Detail&itemSeq=262437742&uq=636633277738425485
-      need a 17pF capacitor
-   ATMega 162: We should have one
-   CLK: We should have one
-   
+   2. mary ann dac palette color bars
+      DAC - www.analog.com/media/en/technical-documentation/data-sheets/AD7302.pdf
+         85:  0101 0101 GN LO
+         170: 1010 1010 GN HI
+         255: 1111 1111 
+
    Document Ocean pipeline + specs
    Breadboard Mary Ann
    Design Ginger
-
+   
 Codenames:
    SS Minnow: The console
    
@@ -33,11 +43,13 @@ http://www.mouser.com/ds/2/436/w65c02s-2572.pdf
 http://www.ti.com/lit/ds/symlink/sn74ahct573.pdf
 http://www.ti.com/lit/ds/symlink/sn74cbtd16211.pdf
 http://www.tij.co.jp/jp/lit/ds/scds033e/scds033e.pdf
-http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2513-8-bit-AVR-Microntroller-ATmega162_Datasheet.pdf
+http://ww1.microchip.com/downloads/en/devicedoc/atmel-2513-8-bit-avr-microntroller-atmega162_datasheet.pdf
 http://www.mouser.com/ds/2/268/doc0006-1066077.pdf
 http://www.cypress.com/file/42836/download
-http://www.nteinc.com/specs/7400to7499/pdf/nte74S00.pdf
-http://www.mouser.com/ds/2/3/ACO-514121.pdf
+http://www.nteinc.com/specs/7400to7499/pdf/nte74s00.pdf
+http://www.mouser.com/ds/2/3/aco-514121.pdf
+adz24: https://www.digikey.com/product-detail/en/analog-devices-inc/ad724jrz/ad724jrz-nd/653959
+3.58mhz clock https://www.digikey.com/scripts/dksearch/dksus.dll?detail&itemseq=262437742&uq=636633277738425485
 
 parts
 ---
@@ -145,14 +157,6 @@ GIL - Details (Up to the cartridge)
    Reads controller data
    Writes input received to debug out for professor
 
-
-video thoughts
----
-www.analog.com/media/en/technical-documentation/data-sheets/AD7302.pdf
-
-85: 0101 0101 GN LO
-170: 1010 1010 GN HI
-255: 1111 1111 
 
 
  
