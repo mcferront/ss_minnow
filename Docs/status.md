@@ -1,12 +1,17 @@
 Mistake 1: gfx port on vsync was wired to clk
 Mistake 2: need a reset pin from prof to gfx
 
-Should VSYNC be held high and HSYNC used for everything?
-   if so we need to modify the 162 code
 
+Get good sync working w/o ad724
+   front porch
+   .3v black level
+   If that all works and ad724 doesn't - get a new chip
+
+.714mv for RIN,GIN,BIN
+   R1=2k, R2=330
+   
+   
 2*CL - 2*CStray (CStray estimated at 5pf)
-
-Reduce r,g,b to .3mV max
 
 next steps
 ----
