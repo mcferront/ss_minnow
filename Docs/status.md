@@ -1,8 +1,8 @@
 Mistake 1: gfx port on vsync was wired to clk
 Mistake 2: need a reset pin from prof to gfx
 
-
 Get good sync working w/o ad724
+   My timings seem off
    front porch
    .3v black level
    If that all works and ad724 doesn't - get a new chip
@@ -11,6 +11,7 @@ Get good sync working w/o ad724
    R1=2k, R2=330
    
    
+v * r2 / (r1 + r2)
 2*CL - 2*CStray (CStray estimated at 5pf)
 
 next steps
