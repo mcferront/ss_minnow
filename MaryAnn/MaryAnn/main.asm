@@ -4,56 +4,18 @@
 ; Created: 3/5/2018 10:26:50 PM
 ; Author : trapper.mcferron
 ;
-.equ STACK_START	= 0x0060
-
-.equ COLOR_PORT		= PORTA
-.equ RED    		= PORTA0
-.equ GREEN			= PORTA1
-.equ BLUE           = PORTA2
-
-.equ VIDEO_PORT		= PORTD
-.equ HSYNC			= PORTD0
-.equ VSYNC			= PORTD1
-.equ _3V            = PORTD2
-
-.MACRO WRITE_COLOR  ;need to take 13.15 cycles
-	ldi @0, (@1 << RED) | (@2 << GREEN) | (@3 << BLUE)  ; 1 cycle
-    out COLOR_PORT, @0                                  ; 2
-    nop ;  3
-    nop ;  4
-    nop ;  5
-    nop ;  6
-    nop ;  7
-    nop ;  8
-    nop ;  9
-    nop ;  10
-    nop ;  11
-    nop ;  12
-    nop ;  13
-.ENDMACRO
-
-.macro SYNC_PULSE	;2 cycles
-	ldi @0, (@1 << HSYNC) | (@2 << VSYNC) | (@3 << _3V)
-	out VIDEO_PORT, @0
-.endmacro
-
-.macro HOLD_3	    ;3 cycles * iteration
-	ldi @1, @2		;+1 cycle
-@0:
-	dec @1	        ;+1 cycle
-	brne @0			;+2 cycles if taken, -1 cycle when not taken (cancels out the ldi)
-.endmacro
+.include "macros.asm"
 
 start:
 	cli
 
     ldi r30, 0  ; constant always at 0
 
-	ldi r16, low(STACK_START)
-	out spl, r16
+	;ldi r16, low(STACK_START)
+	;out spl, r16
 
-	ldi r17, high(STACK_START)
-	out sph, r17
+	;ldi r17, high(STACK_START)
+	;out sph, r17
 
 color_pins_init:
 	; set PORTA0-3 as output (RGB)
@@ -64,9 +26,12 @@ color_pins_init:
 	ldi r16, (1 << DDD0) | (1 << DDD1) | (1 << DDD2)
 	out DDRD, r16
 
+    ; send vsync to prof
+    SYNC_PULSE r16, 0, 1, 0
+
 ; wait for go signal
 wait_for_go:
-    ; output direction
+    ; input direction
     ldi r16, 0 
     out DDRB, r16
 
@@ -80,133 +45,165 @@ wait_for_go_loop:
     andi r16, (1 << PINB0)
     breq wait_for_go_loop
 
-    ; prime registers
-    ldi r17, 0
-    ldi r18, 0
-
     ; 8Mhz = 8,000,000 cycles in a second
     ; each cycle = 1/8uS
     ; 8 cycles = 1uS
     ; N cycles = uS * 8 
-ntsc_hsync:
+
+    ; prime registers
+    ldi r17, 0
+
+main_loop:
+    rjmp inv_sync_pulse                ;6 lines
+main_loop_inv_sync_pulse_done:
+
+    rjmp send_blank_lines              ;14 lines
+main_loop_send_blank_lines_done:
+
+    rjmp send_color_data               ;242 lines
+;main_loop_send_color_data_done:
+
+
+send_color_data:
     ; sync pulse: hold low for 4.7uS (~37.6 cycles) 
     SYNC_PULSE r16, 0, 0, 0        ; 2 cycles
 
-    HOLD_3 back_porch, r16, 0x0b   ; 35
+    HOLD_3 send_color_data_back_porch, r16, 0x0b   ; 35
 
     ; backporch/prime color burst
     ;SYNC_PULSE r16, 1, 0            ; 37
     SYNC_PULSE r16, 0, 0, 1          ; 37  (3v test)
-    
-    ; color burst: hold high for ~5.9uS (~47.2 cycles)
-    HOLD_3 color_burst, r16, 15  ; 45   
+    nop ; 38 (round 37.6 up)
 
-    inc r17     ; 46
-    nop         ; 47
+    ; color burst: hold high for ~4.7uS (~37.6 cycles)
+    HOLD_3 send_color_data_color_burst, r16, 12  ; 36   
 
-ntsc_write_line:
-	; go...we have 51.5 uS 412 cycles
+send_color_data_write_line:
+	; go...we have 52.6 uS 420.8 cycles
 	; for the visible data
 
 	; 13.15 cycles to push each color
 	;WRITE_COLOR r16, 1, 0, 0    ; 13
-    ; send all white
-    SYNC_PULSE r16, 1, 0, 0     ; 2  (3v test)
-    HOLD_3 all_white, r16, 3  ; 11
-    nop ; 12
-    nop ; 13   
-	WRITE_COLOR r16, 0, 1, 0    ; 26
-	WRITE_COLOR r16, 0, 0, 1    ; 39
-	WRITE_COLOR r16, 1, 0, 0    ; 52
-	WRITE_COLOR r16, 0, 1, 0    ; 65
-	WRITE_COLOR r16, 0, 0, 1    ; 78
-	WRITE_COLOR r16, 1, 0, 0    ; 91
-	WRITE_COLOR r16, 0, 1, 0    ; 104
-	WRITE_COLOR r16, 0, 0, 1    ; 117
-	WRITE_COLOR r16, 1, 0, 0    ; 130
-	WRITE_COLOR r16, 0, 1, 0    ; 143
-	WRITE_COLOR r16, 0, 0, 1    ; 156
-	WRITE_COLOR r16, 1, 0, 0    ; 169
-	WRITE_COLOR r16, 0, 1, 0    ; 182
-	WRITE_COLOR r16, 0, 0, 1    ; 195
-	WRITE_COLOR r16, 1, 0, 0    ; 208
-	WRITE_COLOR r16, 0, 1, 0    ; 221
-	WRITE_COLOR r16, 0, 0, 1    ; 234
-	WRITE_COLOR r16, 1, 0, 0    ; 247
-	WRITE_COLOR r16, 0, 1, 0    ; 260
-	WRITE_COLOR r16, 0, 0, 1    ; 273
-	WRITE_COLOR r16, 1, 0, 0    ; 286
-	WRITE_COLOR r16, 0, 1, 0    ; 299
-	WRITE_COLOR r16, 0, 0, 1    ; 312
-	WRITE_COLOR r16, 1, 0, 0    ; 325
-	WRITE_COLOR r16, 0, 1, 0    ; 338
-	WRITE_COLOR r16, 0, 0, 1    ; 351
-	WRITE_COLOR r16, 1, 0, 0    ; 364
-	WRITE_COLOR r16, 0, 1, 0    ; 377
-	WRITE_COLOR r16, 0, 0, 1    ; 390
-	WRITE_COLOR r16, 1, 0, 0    ; 403 - 408 (xtra from rounding error of .15 cycles each)
+
+    nop ;37
+    nop ;38
+
+    nop ;1
+    nop ;2
+    nop ;3
+    nop ;4
+
+    ; send full pulse
+    SYNC_PULSE r16, 1, 0, 0     ; 5/6  (3v test)
+
+    nop ;7
+    nop ;8
+
+    ; write red color with no hold
+    HOLD_3 send_color_data_first_color, r16, 3  ; 17
+
+	WRITE_PULSE r16, 0, 0, 1    ; 30
+	WRITE_PULSE r16, 1, 0, 0    ; 43
+	WRITE_PULSE r16, 0, 0, 1    ; 56
+	WRITE_PULSE r16, 1, 0, 0    ; 69
+	WRITE_PULSE r16, 0, 0, 1    ; 82
+	WRITE_PULSE r16, 1, 0, 0    ; 95
+	WRITE_PULSE r16, 0, 0, 1    ; 108
+	WRITE_PULSE r16, 1, 0, 0    ; 121
+	WRITE_PULSE r16, 0, 0, 1    ; 134
+	WRITE_PULSE r16, 1, 0, 0    ; 147
+	WRITE_PULSE r16, 0, 0, 1    ; 160
+	WRITE_PULSE r16, 1, 0, 0    ; 173
+	WRITE_PULSE r16, 0, 0, 1    ; 186
+	WRITE_PULSE r16, 1, 0, 0    ; 199
+	WRITE_PULSE r16, 0, 0, 1    ; 212
+	WRITE_PULSE r16, 1, 0, 0    ; 225
+	WRITE_PULSE r16, 0, 0, 1    ; 238
+	WRITE_PULSE r16, 1, 0, 0    ; 251
+	WRITE_PULSE r16, 0, 0, 1    ; 264
+	WRITE_PULSE r16, 1, 0, 0    ; 277
+	WRITE_PULSE r16, 0, 0, 1    ; 290
+	WRITE_PULSE r16, 1, 0, 0    ; 303
+	WRITE_PULSE r16, 0, 0, 1    ; 316
+	WRITE_PULSE r16, 1, 0, 0    ; 329
+	WRITE_PULSE r16, 0, 0, 1    ; 342
+	WRITE_PULSE r16, 1, 0, 0    ; 355
+	WRITE_PULSE r16, 0, 0, 1    ; 368
+	WRITE_PULSE r16, 1, 0, 0    ; 381
+	WRITE_PULSE r16, 0, 0, 1    ; 394
+	WRITE_PULSE r16, 1, 0, 0    ; 407
+
+    ; write red color with no hold
+    ;ldi r16, (1 << RED) | (0 << GREEN) | (0 << BLUE)  ; 3
+    ;out COLOR_PORT, r16                               ; 4
+
+    ;HOLD_3 first_color, r16, 3  ; 13
+
+	;WRITE_COLOR r16, 0, 1, 0    ; 26
+	;WRITE_COLOR r16, 0, 0, 1    ; 39
+	;WRITE_COLOR r16, 1, 0, 0    ; 52
+	;WRITE_COLOR r16, 0, 1, 0    ; 65
+	;WRITE_COLOR r16, 0, 0, 1    ; 78
+	;WRITE_COLOR r16, 1, 0, 0    ; 91
+	;WRITE_COLOR r16, 0, 1, 0    ; 104
+	;WRITE_COLOR r16, 0, 0, 1    ; 117
+	;WRITE_COLOR r16, 1, 0, 0    ; 130
+	;WRITE_COLOR r16, 0, 1, 0    ; 143
+	;WRITE_COLOR r16, 0, 0, 1    ; 156
+	;WRITE_COLOR r16, 1, 0, 0    ; 169
+	;WRITE_COLOR r16, 0, 1, 0    ; 182
+	;WRITE_COLOR r16, 0, 0, 1    ; 195
+	;WRITE_COLOR r16, 1, 0, 0    ; 208
+	;WRITE_COLOR r16, 0, 1, 0    ; 221
+	;WRITE_COLOR r16, 0, 0, 1    ; 234
+	;WRITE_COLOR r16, 1, 0, 0    ; 247
+	;WRITE_COLOR r16, 0, 1, 0    ; 260
+	;WRITE_COLOR r16, 0, 0, 1    ; 273
+	;WRITE_COLOR r16, 1, 0, 0    ; 286
+	;WRITE_COLOR r16, 0, 1, 0    ; 299
+	;WRITE_COLOR r16, 0, 0, 1    ; 312
+	;WRITE_COLOR r16, 1, 0, 0    ; 325
+	;WRITE_COLOR r16, 0, 1, 0    ; 338
+	;WRITE_COLOR r16, 0, 0, 1    ; 351
+	;WRITE_COLOR r16, 1, 0, 0    ; 364
+	;WRITE_COLOR r16, 0, 1, 0    ; 377
+	;WRITE_COLOR r16, 0, 0, 1    ; 390
+	;WRITE_COLOR r16, 1, 0, 0    ; 403
 	
     ; write last color with no hold
-    nop ; 409
-    ldi r16, (0 << RED) | (1 << GREEN) | (0 << BLUE)  ; 410
-    out COLOR_PORT, r16                               ; 411
+    ;ldi r16, (0 << RED) | (1 << GREEN) | (0 << BLUE)  ; 404
+    ;out COLOR_PORT, r16                               ; 405
+    ; black
+    SYNC_PULSE r16, 0, 0, 1     ; 409  (3v test)
+    ;nop ; 410
+    inc r17 ; 410
 
-    ; front porch   1.4uS (11.2 cycles)
-    SYNC_PULSE r16, 0, 0, 1  ; 412/1 cycles
+    HOLD_3 send_color_data_final_color, r16, 3 ; 419
+
+    ; front porch   1.5uS (12 cycles)
+    SYNC_PULSE r16, 0, 0, 1  ; 420/1 cycles
     out COLOR_PORT, r30  ; 2
-    nop ; 3
-
-    HOLD_3 front_porch, r16, 0x01   ; 6
-    nop ; 7
  
     ; last visible line?
-    cpi r17, 242            ; 8
-    breq vsync_blank_lines  ; 9 (10 if taken)
-    rjmp ntsc_hsync         ; 11
-
-vsync_blank_lines:
-    ldi r17, 0              ; 11
-
-vsync_blank_lines_loop:
-    ; inverted sync pulse: hold high for 4.7uS (~37.6 cycles) 
-    SYNC_PULSE r16, 1, 0, 0    ; 2 cycles
-
-    HOLD_3 back_porch_inverted, r16, 0x0b   ; 36
-
-    ; inverted color burst
-    SYNC_PULSE r16, 0, 0, 0         ; 37
+    cpi r17, 242            ; 3
+    brne send_color_data_loop  ; 4 (5 if taken)
     
-    ; inverted color burst: hold high for ~5.9uS (~47.2 cycles)
-    HOLD_3 color_burst_inverted, r16, 15  ; 45   
+    ldi r17, 0  ; 5
+    SYNC_PULSE r16, 0, 1, 1  ; 7    (tell prof)
 
-    nop ;46
-    nop ;47
+    nop ; 8
 
-    ; blank scan line 51.5 uS 412 cycles
-    HOLD_3 vsync_blank_lines_hold, r16, 137     ; 411 cycles, one line
+    rjmp main_loop  ; 10 (12 for the rjmp to get here)
     
-    inc r17                 ; 412
+send_color_data_loop:
+    nop ; 6
+    nop ; 7
+    nop ; 8
+    nop ; 9
+    nop ; 10
 
-    ; front porch is inverted, stays low 1.4us (11.2 cycles)
-    cpi r17, 20             ; 1
-    brne vsync_inverted_front_porch_wait  ; 2 (3 if taken)
+    rjmp send_color_data         ; 12
 
-    ; done with frame, going back to hsync
-    ldi r17, 0              ; 3
-    ;  tell prof a vblank is occuring
-    SYNC_PULSE  r16, 0, 1, 0 ; 5
-    nop ;6
-    nop ;7
-    nop ;8
-    nop ;9
 
-    rjmp ntsc_hsync          ; 11
     
-vsync_inverted_front_porch_wait:
-    nop ;4
-    nop ;5
-    nop ;6
-    nop ;7
-    nop ;8
-    nop ;9
-    rjmp vsync_blank_lines_loop ;11
+.include "sync_pulse.asm"

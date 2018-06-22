@@ -2,10 +2,8 @@ Mistake 1: gfx port on vsync was wired to clk
 Mistake 2: need a reset pin from prof to gfx
 
 Get good sync working w/o ad724
-   My timings seem off
-   front porch
-   .3v black level
-   If that all works and ad724 doesn't - get a new chip
+   timings for b/w are correct
+   change voltage/color to hsync and see if it works for color
 
 .714mv for RIN,GIN,BIN
    R1=2k, R2=330
