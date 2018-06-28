@@ -9,7 +9,10 @@ next steps
          85:  0101 0101 GN LO
          170: 1010 1010 GN HI
          255: 1111 1111 
-
+      replace big caps with smaller ones
+      replace 75ohm output with lesser resistor for brighter colors
+      schematic current version of mary ann
+         
    Document Ocean pipeline + specs
    Breadboard Mary Ann
    Design Ginger
