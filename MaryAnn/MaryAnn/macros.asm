@@ -33,8 +33,9 @@
 .ENDMACRO
 
 .MACRO WRITE_COLOR  ;need to take 13.15 cycles
-	ldi @0, (@1 << RED) | (@2 << GREEN) | (@3 << BLUE)  ; 1 cycle
-    out COLOR_PORT, @0                                  ; 2
+	ldi @0, (@1 << RED) | (@2 << GREEN) | (@3 << BLUE)  ; 13 cycle
+    out COLOR_PORT, @0                                  ; 1
+    nop ;  2
     nop ;  3
     nop ;  4
     nop ;  5

@@ -71,8 +71,8 @@ send_color_data:
     HOLD_3 send_color_data_back_porch, r16, 0x0b   ; 35
 
     ; backporch/prime color burst
-    ;SYNC_PULSE r16, 1, 0            ; 37
-    SYNC_PULSE r16, 0, 0, 1          ; 37  (3v test)
+    SYNC_PULSE r16, 1, 0, 0           ; 37
+    ;SYNC_PULSE r16, 0, 0, 1          ; 37  (3v test)
     nop ; 38 (round 37.6 up)
 
     ; color burst: hold high for ~4.7uS (~37.6 cycles)
@@ -82,9 +82,6 @@ send_color_data_write_line:
 	; go...we have 52.6 uS 420.8 cycles
 	; for the visible data
 
-	; 13.15 cycles to push each color
-	;WRITE_COLOR r16, 1, 0, 0    ; 13
-
     nop ;37
     nop ;38
 
@@ -93,95 +90,106 @@ send_color_data_write_line:
     nop ;3
     nop ;4
 
-    ; send full pulse
-    SYNC_PULSE r16, 1, 0, 0     ; 5/6  (3v test)
 
-    nop ;7
-    nop ;8
-
-    ; write red color with no hold
-    HOLD_3 send_color_data_first_color, r16, 3  ; 17
-
-	WRITE_PULSE r16, 0, 0, 1    ; 30
-	WRITE_PULSE r16, 1, 0, 0    ; 43
-	WRITE_PULSE r16, 0, 0, 1    ; 56
-	WRITE_PULSE r16, 1, 0, 0    ; 69
-	WRITE_PULSE r16, 0, 0, 1    ; 82
-	WRITE_PULSE r16, 1, 0, 0    ; 95
-	WRITE_PULSE r16, 0, 0, 1    ; 108
-	WRITE_PULSE r16, 1, 0, 0    ; 121
-	WRITE_PULSE r16, 0, 0, 1    ; 134
-	WRITE_PULSE r16, 1, 0, 0    ; 147
-	WRITE_PULSE r16, 0, 0, 1    ; 160
-	WRITE_PULSE r16, 1, 0, 0    ; 173
-	WRITE_PULSE r16, 0, 0, 1    ; 186
-	WRITE_PULSE r16, 1, 0, 0    ; 199
-	WRITE_PULSE r16, 0, 0, 1    ; 212
-	WRITE_PULSE r16, 1, 0, 0    ; 225
-	WRITE_PULSE r16, 0, 0, 1    ; 238
-	WRITE_PULSE r16, 1, 0, 0    ; 251
-	WRITE_PULSE r16, 0, 0, 1    ; 264
-	WRITE_PULSE r16, 1, 0, 0    ; 277
-	WRITE_PULSE r16, 0, 0, 1    ; 290
-	WRITE_PULSE r16, 1, 0, 0    ; 303
-	WRITE_PULSE r16, 0, 0, 1    ; 316
-	WRITE_PULSE r16, 1, 0, 0    ; 329
-	WRITE_PULSE r16, 0, 0, 1    ; 342
-	WRITE_PULSE r16, 1, 0, 0    ; 355
-	WRITE_PULSE r16, 0, 0, 1    ; 368
-	WRITE_PULSE r16, 1, 0, 0    ; 381
-	WRITE_PULSE r16, 0, 0, 1    ; 394
-	WRITE_PULSE r16, 1, 0, 0    ; 407
+; BEGIN 3V TEST PULSES--------------------------------------
+    ; send full pulse (also works as first tile for 3v test)
+    ; SYNC_PULSE r16, 1, 0, 0     ; 5/6  (3v test)
 
     ; write red color with no hold
-    ;ldi r16, (1 << RED) | (0 << GREEN) | (0 << BLUE)  ; 3
-    ;out COLOR_PORT, r16                               ; 4
+    ;HOLD_3 send_color_data_first_color, r16, 3  ; 15
+    ;nop ;16
+    ;nop ;17
 
-    ;HOLD_3 first_color, r16, 3  ; 13
+	;WRITE_PULSE r16, 0, 0, 1    ; 30
+	;WRITE_PULSE r16, 1, 0, 0    ; 43
+	;WRITE_PULSE r16, 0, 0, 1    ; 56
+	;WRITE_PULSE r16, 1, 0, 0    ; 69
+	;WRITE_PULSE r16, 0, 0, 1    ; 82
+	;WRITE_PULSE r16, 1, 0, 0    ; 95
+	;WRITE_PULSE r16, 0, 0, 1    ; 108
+	;WRITE_PULSE r16, 1, 0, 0    ; 121
+	;WRITE_PULSE r16, 0, 0, 1    ; 134
+	;WRITE_PULSE r16, 1, 0, 0    ; 147
+	;WRITE_PULSE r16, 0, 0, 1    ; 160
+	;WRITE_PULSE r16, 1, 0, 0    ; 173
+	;WRITE_PULSE r16, 0, 0, 1    ; 186
+	;WRITE_PULSE r16, 1, 0, 0    ; 199
+	;WRITE_PULSE r16, 0, 0, 1    ; 212
+	;WRITE_PULSE r16, 1, 0, 0    ; 225
+	;WRITE_PULSE r16, 0, 0, 1    ; 238
+	;WRITE_PULSE r16, 1, 0, 0    ; 251
+	;WRITE_PULSE r16, 0, 0, 1    ; 264
+	;WRITE_PULSE r16, 1, 0, 0    ; 277
+	;WRITE_PULSE r16, 0, 0, 1    ; 290
+	;WRITE_PULSE r16, 1, 0, 0    ; 303
+	;WRITE_PULSE r16, 0, 0, 1    ; 316
+	;WRITE_PULSE r16, 1, 0, 0    ; 329
+	;WRITE_PULSE r16, 0, 0, 1    ; 342
+	;WRITE_PULSE r16, 1, 0, 0    ; 355
+	;WRITE_PULSE r16, 0, 0, 1    ; 368
+	;WRITE_PULSE r16, 1, 0, 0    ; 381
+	;WRITE_PULSE r16, 0, 0, 1    ; 394
+	;WRITE_PULSE r16, 1, 0, 0    ; 407
+    ; last tile - black (but don't hold 13 cycles)
+    ;SYNC_PULSE r16, 0, 0, 1     ; 409  (3v test)
+; END 3V TEST PULSES--------------------------------------
 
-	;WRITE_COLOR r16, 0, 1, 0    ; 26
-	;WRITE_COLOR r16, 0, 0, 1    ; 39
-	;WRITE_COLOR r16, 1, 0, 0    ; 52
-	;WRITE_COLOR r16, 0, 1, 0    ; 65
-	;WRITE_COLOR r16, 0, 0, 1    ; 78
-	;WRITE_COLOR r16, 1, 0, 0    ; 91
-	;WRITE_COLOR r16, 0, 1, 0    ; 104
-	;WRITE_COLOR r16, 0, 0, 1    ; 117
-	;WRITE_COLOR r16, 1, 0, 0    ; 130
-	;WRITE_COLOR r16, 0, 1, 0    ; 143
-	;WRITE_COLOR r16, 0, 0, 1    ; 156
-	;WRITE_COLOR r16, 1, 0, 0    ; 169
-	;WRITE_COLOR r16, 0, 1, 0    ; 182
-	;WRITE_COLOR r16, 0, 0, 1    ; 195
-	;WRITE_COLOR r16, 1, 0, 0    ; 208
-	;WRITE_COLOR r16, 0, 1, 0    ; 221
-	;WRITE_COLOR r16, 0, 0, 1    ; 234
-	;WRITE_COLOR r16, 1, 0, 0    ; 247
-	;WRITE_COLOR r16, 0, 1, 0    ; 260
-	;WRITE_COLOR r16, 0, 0, 1    ; 273
-	;WRITE_COLOR r16, 1, 0, 0    ; 286
-	;WRITE_COLOR r16, 0, 1, 0    ; 299
-	;WRITE_COLOR r16, 0, 0, 1    ; 312
-	;WRITE_COLOR r16, 1, 0, 0    ; 325
-	;WRITE_COLOR r16, 0, 1, 0    ; 338
-	;WRITE_COLOR r16, 0, 0, 1    ; 351
-	;WRITE_COLOR r16, 1, 0, 0    ; 364
-	;WRITE_COLOR r16, 0, 1, 0    ; 377
-	;WRITE_COLOR r16, 0, 0, 1    ; 390
-	;WRITE_COLOR r16, 1, 0, 0    ; 403
+; BEGIN COLOR BAR TEST --------------------------------------
+    ; write red color with no hold
+    ldi r16, (1 << RED) | (0 << GREEN) | (0 << BLUE)  ; 5
+    out COLOR_PORT, r16                               ; 6
+
+    HOLD_3 first_color, r16, 3  ; 15
+    nop ;16
+    nop ;17
+
+	WRITE_COLOR r16, 0, 1, 0    ; 30
+	WRITE_COLOR r16, 0, 0, 1    ; 43
+	WRITE_COLOR r16, 1, 0, 0    ; 56
+	WRITE_COLOR r16, 0, 1, 0    ; 69
+	WRITE_COLOR r16, 0, 0, 1    ; 82
+	WRITE_COLOR r16, 1, 0, 0    ; 95
+	WRITE_COLOR r16, 0, 1, 0    ; 108
+	WRITE_COLOR r16, 0, 0, 1    ; 121
+	WRITE_COLOR r16, 1, 0, 0    ; 134
+	WRITE_COLOR r16, 0, 1, 0    ; 147
+	WRITE_COLOR r16, 0, 0, 1    ; 160
+	WRITE_COLOR r16, 1, 0, 0    ; 173
+	WRITE_COLOR r16, 0, 1, 0    ; 186
+	WRITE_COLOR r16, 0, 0, 1    ; 199
+	WRITE_COLOR r16, 1, 0, 0    ; 212
+	WRITE_COLOR r16, 0, 1, 0    ; 225
+	WRITE_COLOR r16, 0, 0, 1    ; 238
+	WRITE_COLOR r16, 1, 0, 0    ; 251
+	WRITE_COLOR r16, 0, 1, 0    ; 264
+	WRITE_COLOR r16, 0, 0, 1    ; 277
+	WRITE_COLOR r16, 1, 0, 0    ; 290
+	WRITE_COLOR r16, 0, 1, 0    ; 303
+	WRITE_COLOR r16, 0, 0, 1    ; 316
+	WRITE_COLOR r16, 1, 0, 0    ; 329
+	WRITE_COLOR r16, 0, 1, 0    ; 342
+	WRITE_COLOR r16, 0, 0, 1    ; 355
+	WRITE_COLOR r16, 1, 0, 0    ; 368
+	WRITE_COLOR r16, 0, 1, 0    ; 381
+	WRITE_COLOR r16, 0, 0, 1    ; 394
+	WRITE_COLOR r16, 1, 0, 0    ; 407
 	
     ; write last color with no hold
-    ;ldi r16, (0 << RED) | (1 << GREEN) | (0 << BLUE)  ; 404
-    ;out COLOR_PORT, r16                               ; 405
+    ldi r16, (0 << RED) | (1 << GREEN) | (0 << BLUE)  ; 408
+    out COLOR_PORT, r16                               ; 409
+    
     ; black
-    SYNC_PULSE r16, 0, 0, 1     ; 409  (3v test)
-    ;nop ; 410
+    ;SYNC_PULSE r16, 1, 0, 0     ; 409
+    ;SYNC_PULSE r16, 0, 0, 1     ; 409  (3v test)
+; END COLOR BAR TEST --------------------------------------
+
     inc r17 ; 410
 
     HOLD_3 send_color_data_final_color, r16, 3 ; 419
 
     ; front porch   1.5uS (12 cycles)
-    SYNC_PULSE r16, 0, 0, 1  ; 420/1 cycles
+    SYNC_PULSE r16, 1, 0, 0            ; 420/1
+    ;SYNC_PULSE r16, 0, 0, 1  ; 420/1 cycles (3v test)
     out COLOR_PORT, r30  ; 2
  
     ; last visible line?
@@ -189,7 +197,8 @@ send_color_data_write_line:
     brne send_color_data_loop  ; 4 (5 if taken)
     
     ldi r17, 0  ; 5
-    SYNC_PULSE r16, 0, 1, 1  ; 7    (tell prof)
+    SYNC_PULSE r16, 1, 1, 0            ; 7 (3 v test)
+    ;SYNC_PULSE r16, 0, 1, 1  ; 7    (3v test) (tell prof)
 
     nop ; 8
 

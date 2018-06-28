@@ -1,24 +1,10 @@
 Mistake 1: gfx port on vsync was wired to clk
 Mistake 2: need a reset pin from prof to gfx
 
-Get good sync working w/o ad724
-   timings for b/w are correct
-   change voltage/color to hsync and see if it works for color
-
-.714mv for RIN,GIN,BIN
-   R1=2k, R2=330
-   
-   
-v * r2 / (r1 + r2)
-2*CL - 2*CStray (CStray estimated at 5pf)
-
 next steps
 ----
-   1. mary ann color bars
-      when it works test by sending everything out HSYNC and keeping vsync high
-         this would free a pin
-   
-   2. mary ann dac palette color bars
+   0. remove obslete 3v testing code and 3v pin code
+   1. mary ann dac palette color bars
       DAC - www.analog.com/media/en/technical-documentation/data-sheets/AD7302.pdf
          85:  0101 0101 GN LO
          170: 1010 1010 GN HI
@@ -63,6 +49,8 @@ RX/TX: https://www.digikey.com/scripts/DkSearch/dksus.dll?Detail&itemSeq=2609352
 power: https://www.digikey.com/scripts/DkSearch/dksus.dll?Detail&itemSeq=260935383&uq=636620306589881119
 
 
+voltage divider: v * r2 / (r1 + r2)
+capacitance calc: 2*CL - 2*CStray (CStray estimated at 5pf)
 
 descriptions
   

@@ -6,8 +6,8 @@ inv_sync_pulse:
     HOLD_3 inv_sync_pulse_back_porch, r16, 0x0b   ; 35
 
     ; backporch/prime color burst
-    ;SYNC_PULSE r16, 1, 0            ; 37
-    SYNC_PULSE r16, 0, 0, 0          ; 37  (3v test)
+    SYNC_PULSE r16, 0, 0, 0          ; 37
+    ;SYNC_PULSE r16, 0, 0, 0          ; 37  (3v test)
     nop ; 38 (round 37.6 up)
 
     ; color burst: hold high for ~4.7uS (~37.6 cycles)
@@ -53,8 +53,8 @@ send_blank_lines:
     HOLD_3 send_blank_lines_back_porch, r16, 0x0b   ; 35
 
     ; backporch/prime color burst
-    ;SYNC_PULSE r16, 1, 0            ; 37
-    SYNC_PULSE r16, 0, 0, 1          ; 37  (3v test)
+    SYNC_PULSE r16, 1, 0, 0           ; 37
+    ;SYNC_PULSE r16, 0, 0, 1          ; 37  (3v test)
     nop ; 38 (round 37.6 up)
 
     ; color burst: hold high for ~4.7uS (~37.6 cycles)
@@ -70,7 +70,8 @@ send_blank_lines:
     nop ; 419
 
     ; front porch   1.5uS (12 cycles)
-    SYNC_PULSE r16, 0, 0, 1  ; 420/1 cycles
+    SYNC_PULSE r16, 1, 0, 0            ; 420/1
+    ;SYNC_PULSE r16, 0, 0, 1  ; 420/1 cycles  (3v test)
     out COLOR_PORT, r30  ; 2
 
     cpi r17, 14                           ; 3
