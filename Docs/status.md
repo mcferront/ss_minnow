@@ -1,17 +1,17 @@
 Mistake 1: gfx port on vsync was wired to clk
-Mistake 2: need a reset pin from prof to gfx
+Mistake 2: need a reset pin from prof to gfx - hold high until ready to go
+
+.714mv for RIN,GIN,BIN
+   R1=2k, R2=330
 
 next steps
 ----
-   0. remove obslete 3v testing code and 3v pin code
    1. mary ann dac palette color bars
       DAC - www.analog.com/media/en/technical-documentation/data-sheets/AD7302.pdf
          85:  0101 0101 GN LO
          170: 1010 1010 GN HI
          255: 1111 1111 
-      replace big caps with smaller ones
-      replace 75ohm output with lesser resistor for brighter colors
-      schematic current version of mary ann
+   2. schematic current version of mary ann
          
    Document Ocean pipeline + specs
    Breadboard Mary Ann

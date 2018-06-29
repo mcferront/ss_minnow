@@ -8,32 +8,16 @@
 
 .equ COLOR_PORT		= PORTA
 .equ RED    		= PORTA0
-.equ GREEN			= PORTA1
-.equ BLUE           = PORTA2
+.equ GREEN_HI		= PORTA1
+.equ GREEN_LO		= PORTA1
+.equ BLUE           = PORTA3
 
 .equ VIDEO_PORT		= PORTD
 .equ HSYNC			= PORTD0
 .equ VSYNC			= PORTD1
-.equ _3V            = PORTD2
-
-.MACRO WRITE_PULSE  ;need to take 13.15 cycles
-	ldi @0, (@1 << HSYNC) | (@2 << VSYNC) | (@3 << _3V) ; 13
-    out VIDEO_PORT, @0                                  ; 1
-    nop ;  2
-    nop ;  3
-    nop ;  4
-    nop ;  5
-    nop ;  6
-    nop ;  7
-    nop ;  8
-    nop ;  9
-    nop ;  10
-    nop ;  11
-    nop ;  12
-.ENDMACRO
 
 .MACRO WRITE_COLOR  ;need to take 13.15 cycles
-	ldi @0, (@1 << RED) | (@2 << GREEN) | (@3 << BLUE)  ; 13 cycle
+	ldi @0, (@1 << RED) | (@2 << GREEN_HI) | (@3 << GREEN_LO) | (@3 << BLUE)  ; 13 cycle
     out COLOR_PORT, @0                                  ; 1
     nop ;  2
     nop ;  3
@@ -49,7 +33,7 @@
 .ENDMACRO
 
 .macro SYNC_PULSE	;2 cycles
-	ldi @0, (@1 << HSYNC) | (@2 << VSYNC) | (@3 << _3V)
+	ldi @0, (@1 << HSYNC) | (@2 << VSYNC)
 	out VIDEO_PORT, @0
 .endmacro
 
