@@ -1,16 +1,22 @@
+
 Mistake 1: gfx port on vsync was wired to clk
 Mistake 2: need a reset pin from prof to gfx - hold high until ready to go
 
 .714mv for RIN,GIN,BIN
    R1=2k, R2=330
 
+
+   
 next steps
 ----
    1. mary ann dac palette color bars
-      DAC - www.analog.com/media/en/technical-documentation/data-sheets/AD7302.pdf
-         85:  0101 0101 GN LO
-         170: 1010 1010 GN HI
-         255: 1111 1111 
+      DAC - http://www.analog.com/media/en/technical-documentation/data-sheets/AD558.pdf
+         Bit 6: GN HI | GN LO
+         00:  0000 0000             0.00V    
+         85:  0111 1111 GN LO       1.27V
+         170: 1100 0000 GN HI       1.92V
+         255: 1111 1111             2.55V
+         
    2. schematic current version of mary ann
          
    Document Ocean pipeline + specs

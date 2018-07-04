@@ -9,7 +9,7 @@
 .equ COLOR_PORT		= PORTA
 .equ RED    		= PORTA0
 .equ GREEN_HI		= PORTA1
-.equ GREEN_LO		= PORTA1
+.equ GREEN_LO		= PORTA2
 .equ BLUE           = PORTA3
 
 .equ VIDEO_PORT		= PORTD
