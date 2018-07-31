@@ -17,7 +17,7 @@
 .equ VSYNC			= PORTD1
 
 .MACRO WRITE_COLOR  ;need to take 13.15 cycles
-	ldi @0, (@1 << RED) | (@2 << GREEN_HI) | (@3 << GREEN_LO) | (@3 << BLUE)  ; 13 cycle
+	ldi @0, (@1 << RED) | (@2 << GREEN_HI) | (@3 << GREEN_LO) | (@4 << BLUE)  ; 13 cycle
     out COLOR_PORT, @0                                  ; 1
     nop ;  2
     nop ;  3

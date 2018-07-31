@@ -90,47 +90,48 @@ send_color_data_write_line:
     nop ;4
 
 ; BEGIN COLOR BAR TEST --------------------------------------
-    ; write red color with no hold
-    ldi r16, (1 << BLUE)                                 ; 5
+    ; write blue color with no hold
+    ldi r16, 0                                 ; 5
     out COLOR_PORT, r16                               ; 6
 
     HOLD_3 first_color, r16, 3  ; 15
     nop ;16
     nop ;17
 
-	WRITE_COLOR r16, 0, 0, 1, 0 ; 30
-	WRITE_COLOR r16, 0, 0, 1, 1 ; 43
-	WRITE_COLOR r16, 0, 1, 0, 0 ; 56
-	WRITE_COLOR r16, 0, 1, 0, 1 ; 69
-	WRITE_COLOR r16, 0, 1, 1, 0 ; 82
-	WRITE_COLOR r16, 0, 1, 1, 1 ; 95
-	WRITE_COLOR r16, 1, 0, 0, 0 ; 108
-	WRITE_COLOR r16, 1, 0, 0, 1 ; 121
+	WRITE_COLOR r16, 0, 0, 1, 0 ; 30    
+	WRITE_COLOR r16, 0, 1, 0, 0 ; 43
+	WRITE_COLOR r16, 0, 1, 1, 0 ; 56
+	WRITE_COLOR r16, 0, 0, 0, 1 ; 69
+	WRITE_COLOR r16, 0, 0, 1, 1 ; 82
+	WRITE_COLOR r16, 0, 1, 0, 1 ; 95
+	WRITE_COLOR r16, 0, 1, 1, 1 ; 108
+	WRITE_COLOR r16, 1, 0, 0, 0 ; 121
 	WRITE_COLOR r16, 1, 0, 1, 0 ; 134
-	WRITE_COLOR r16, 1, 0, 1, 1 ; 147
-	WRITE_COLOR r16, 1, 1, 0, 0 ; 160
-	WRITE_COLOR r16, 1, 1, 0, 1 ; 173
-	WRITE_COLOR r16, 1, 1, 1, 0 ; 186
-	WRITE_COLOR r16, 1, 1, 1, 1 ; 199
-	WRITE_COLOR r16, 0, 0, 0, 0 ; 212
-	WRITE_COLOR r16, 0, 0, 0, 1 ; 225
+	WRITE_COLOR r16, 1, 1, 0, 0 ; 147
+	WRITE_COLOR r16, 1, 1, 1, 0 ; 160
+	WRITE_COLOR r16, 1, 0, 0, 1 ; 173
+	WRITE_COLOR r16, 1, 0, 1, 1 ; 186
+	WRITE_COLOR r16, 1, 1, 0, 1 ; 199
+	WRITE_COLOR r16, 1, 1, 1, 1 ; 212
+
+	WRITE_COLOR r16, 0, 0, 0, 0 ; 225
 	WRITE_COLOR r16, 0, 0, 1, 0 ; 238
-	WRITE_COLOR r16, 0, 0, 1, 1 ; 251
-	WRITE_COLOR r16, 0, 1, 0, 0 ; 264
-	WRITE_COLOR r16, 0, 1, 0, 1 ; 277
-	WRITE_COLOR r16, 0, 1, 1, 0 ; 290
-	WRITE_COLOR r16, 0, 1, 1, 1 ; 303
-	WRITE_COLOR r16, 1, 0, 0, 0 ; 316
-	WRITE_COLOR r16, 1, 0, 0, 1 ; 329
+	WRITE_COLOR r16, 0, 1, 0, 0 ; 251
+	WRITE_COLOR r16, 0, 1, 1, 0 ; 264
+	WRITE_COLOR r16, 0, 0, 0, 1 ; 277
+	WRITE_COLOR r16, 0, 0, 1, 1 ; 290
+	WRITE_COLOR r16, 0, 1, 0, 1 ; 303
+	WRITE_COLOR r16, 0, 1, 1, 1 ; 316
+	WRITE_COLOR r16, 1, 0, 0, 0 ; 329
 	WRITE_COLOR r16, 1, 0, 1, 0 ; 342
-	WRITE_COLOR r16, 1, 0, 1, 1 ; 355
-	WRITE_COLOR r16, 1, 1, 0, 0 ; 368
-	WRITE_COLOR r16, 1, 1, 0, 1 ; 381
-	WRITE_COLOR r16, 1, 1, 1, 0 ; 394
-	WRITE_COLOR r16, 1, 1, 1, 1 ; 407
-	
+	WRITE_COLOR r16, 1, 1, 0, 0 ; 355
+	WRITE_COLOR r16, 1, 1, 1, 0 ; 368
+	WRITE_COLOR r16, 1, 0, 0, 1 ; 381
+	WRITE_COLOR r16, 1, 0, 1, 1 ; 394
+	WRITE_COLOR r16, 1, 1, 0, 1 ; 407
+
     ; write last color with no hold
-    ldi r16, 0  ; 408
+    ldi r16, 0xff  ; 408
     out COLOR_PORT, r16                               ; 409
 
 ; END COLOR BAR TEST --------------------------------------

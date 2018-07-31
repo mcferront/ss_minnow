@@ -5,17 +5,11 @@ Mistake 2: need a reset pin from prof to gfx - hold high until ready to go
 .714mv for RIN,GIN,BIN
    R1=2k, R2=330
 
-
-   
 next steps
 ----
    1. mary ann dac palette color bars
-      DAC - http://www.analog.com/media/en/technical-documentation/data-sheets/AD558.pdf
-         Bit 6: GN HI | GN LO
-         00:  0000 0000             0.00V    
-         85:  0111 1111 GN LO       1.27V
-         170: 1100 0000 GN HI       1.92V
-         255: 1111 1111             2.55V
+      color bleeding - DAC probably too slow... add delay line for red/blue
+      delay line: https://www.digikey.com/product-detail/en/DS1100Z-500%2b/DS1100Z-500%2b-ND/1017668/?itemSeq=267939658
          
    2. schematic current version of mary ann
          
@@ -50,12 +44,20 @@ http://www.mouser.com/ds/2/3/aco-514121.pdf
 adz24: https://www.digikey.com/product-detail/en/analog-devices-inc/ad724jrz/ad724jrz-nd/653959
 3.58mhz clock https://www.digikey.com/scripts/dksearch/dksus.dll?detail&itemseq=262437742&uq=636633277738425485
 
+
 parts
 ---
 RS232: https://www.digikey.com/scripts/DkSearch/dksus.dll?Detail&itemSeq=260934583&uq=636620306589871118
 GFX: https://www.digikey.com/scripts/DkSearch/dksus.dll?Detail&itemSeq=260935529&uq=636620308485770689
 RX/TX: https://www.digikey.com/scripts/DkSearch/dksus.dll?Detail&itemSeq=260935232&uq=636620306589881119
 power: https://www.digikey.com/scripts/DkSearch/dksus.dll?Detail&itemSeq=260935383&uq=636620306589881119
+delay line: https://www.digikey.com/product-detail/en/DS1100Z-500%2b/DS1100Z-500%2b-ND/1017668/?itemSeq=267939658     
+DAC - http://www.analog.com/media/en/technical-documentation/data-sheets/AD558.pdf
+   Bit 6: GN HI | GN LO
+   00:  0000 0000             0.00V    
+   85:  0111 1111 GN LO       1.27V
+   170: 1100 0000 GN HI       1.92V
+   255: 1111 1111             2.55V
 
 
 voltage divider: v * r2 / (r1 + r2)
