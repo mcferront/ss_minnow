@@ -1,4 +1,3 @@
-
 Mistake 1: gfx port on vsync was wired to clk
 Mistake 2: need a reset pin from prof to gfx - hold high until ready to go
 
@@ -7,11 +6,8 @@ Mistake 2: need a reset pin from prof to gfx - hold high until ready to go
 
 next steps
 ----
-   1. mary ann dac palette color bars
-      color bleeding - DAC probably too slow... add delay line for red/blue
-      delay line: https://www.digikey.com/product-detail/en/DS1100Z-500%2b/DS1100Z-500%2b-ND/1017668/?itemSeq=267939658
-         
-   2. schematic current version of mary ann
+   1. Verify pins and sizes of color generator and order
+   2. Start Mary Ann with a single shift register
          
    Document Ocean pipeline + specs
    Breadboard Mary Ann
