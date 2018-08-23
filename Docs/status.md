@@ -6,7 +6,13 @@ Mistake 2: need a reset pin from prof to gfx - hold high until ready to go
 
 next steps
 ----
-   1. Verify pins and sizes of color generator and order
+   1. Get Color Generator PCB working
+      ordered: 
+         *RCJ-041 rca connector
+         *2 delay lines
+         *OR gate
+         *10 pin port?
+      
    2. Start Mary Ann with a single shift register
          
    Document Ocean pipeline + specs
