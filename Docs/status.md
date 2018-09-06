@@ -1,20 +1,24 @@
 Mistake 1: gfx port on vsync was wired to clk
 Mistake 2: need a reset pin from prof to gfx - hold high until ready to go
 
-.714mv for RIN,GIN,BIN
+5v -> .714v for RIN,BIN
    R1=2k, R2=330
+   
+2.55v -> .714v for GIN
+   R1 = 680
+   R2 = 270
 
+   .724
+   
+voltage divider: v * r2 / (r1 + r2)
+   
 next steps
 ----
-   1. Get Color Generator PCB working
-      ordered: 
-         *RCJ-041 rca connector
-         *2 delay lines
-         *OR gate
-         *10 pin port?
-      
-   2. Start Mary Ann with a single shift register
-         
+   Mary Ann with a single shift register
+      write code
+      order parts
+      breadboard
+   
    Document Ocean pipeline + specs
    Breadboard Mary Ann
    Design Ginger
