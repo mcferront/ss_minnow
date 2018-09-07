@@ -15,7 +15,6 @@ voltage divider: v * r2 / (r1 + r2)
 next steps
 ----
    Mary Ann with a single shift register
-      write code
       order parts
       breadboard
    

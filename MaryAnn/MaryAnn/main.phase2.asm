@@ -8,14 +8,14 @@
 .equ TILE_VROM		= 0x0100
 .equ SCAN_BUFFER	= 0x1000
 
-.equ COLOR_PORT		= PORTC
-.equ RED			= PORTC2
-.equ GREEN_LO		= PORTC3
+.equ COLOR_PORT	= PORTC
+.equ RED			   = PORTC2
+.equ GREEN_LO	   = PORTC3
 .equ GREEN_HI		= PORTC4
 .equ BLUE			= PORTC5
 .equ SR_TOGGLE		= PORTC7
 
-.equ VIDEO_PORT		= PORTD
+.equ VIDEO_PORT	= PORTD
 .equ HSYNC			= PORTD0
 .equ VSYNC			= PORTD1
 

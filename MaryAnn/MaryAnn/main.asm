@@ -8,26 +8,37 @@
 
 start:
 	cli
-
     ldi r30, 0  ; constant always at 0
 
-	;ldi r16, low(STACK_START)
-	;out spl, r16
+xmem_init:
+    ldi r16, 1 << SRE
+    out MCUCR, r16
 
-	;ldi r17, high(STACK_START)
-	;out sph, r17
+    ldi r16, (1 << XMM2) | (1 << XMM0)  //pc3+ open
+    out XMBK, r16
 
-color_pins_init:
-	; set PORTA0-3 as output (RGGB)
-	ldi r16, (1 << DDA0) | (1 << DDA1) | (1 << DDA2) | (1 << DDA3)
-	out DDRA, r16
+pins_init:
+    ; set sr toggle as output
+	ldi r16, (1 << DDC7)
+	out DDRD, r16
 
-	; set hsync/prof sync as output
+	; set hsync/prof vsync as output
 	ldi r16, (1 << DDD0) | (1 << DDD1)
 	out DDRD, r16
 
-    ; send vsync to prof
-    SYNC_PULSE r16, 0, 1
+    ; fill 128 bytes (4 bytes per tile, 32 tiles)
+fill_buffer:
+    ldi r31, high(SCAN_BUFFER)
+    ldi r17, 0xaa //0101 0101
+    ldi r16, 32
+
+fill_buffer_loop:
+    st Z+, r17  ; -> red
+    st Z+, r17  ; -> green hi
+    st Z+, r17  ; -> green lo
+    st Z+, r17  ; -> blue
+    dec r16
+    brne fill_buffer_loop
 
 ; wait for go signal
 wait_for_go:
@@ -51,7 +62,13 @@ wait_for_go_loop:
     ; N cycles = uS * 8 
 
     ; prime registers
-    ldi r17, 0
+    ldi r17, 0  ; line count
+
+    ldi r20, 0  ; buffer a
+    ldi r21, 1  ; buffer b
+
+    ; send vsync to prof
+    SYNC_PULSE r16, 0, 1
 
 main_loop:
     rjmp inv_sync_pulse                ;6 lines
@@ -77,73 +94,57 @@ send_color_data:
     ; color burst: hold high for ~4.7uS (~37.6 cycles)
     HOLD_3 send_color_data_color_burst, r16, 12  ; 36   
 
+    nop ;37
+    nop ;38
+
 send_color_data_write_line:
 	; go...we have 52.6 uS 420.8 cycles
 	; for the visible data
 
-    nop ;37
-    nop ;38
-
     nop ;1
     nop ;2
     nop ;3
-    nop ;4
 
-; BEGIN COLOR BAR TEST --------------------------------------
-    ; write blue color with no hold
-    ldi r16, 0                                 ; 5
-    out COLOR_PORT, r16                               ; 6
-
-    HOLD_3 first_color, r16, 3  ; 15
-    nop ;16
-    nop ;17
-
-	WRITE_COLOR r16, 0, 0, 1, 0 ; 30    
-	WRITE_COLOR r16, 0, 1, 0, 0 ; 43
-	WRITE_COLOR r16, 0, 1, 1, 0 ; 56
-	WRITE_COLOR r16, 0, 0, 0, 1 ; 69
-	WRITE_COLOR r16, 0, 0, 1, 1 ; 82
-	WRITE_COLOR r16, 0, 1, 0, 1 ; 95
-	WRITE_COLOR r16, 0, 1, 1, 1 ; 108
-	WRITE_COLOR r16, 1, 0, 0, 0 ; 121
-	WRITE_COLOR r16, 1, 0, 1, 0 ; 134
-	WRITE_COLOR r16, 1, 1, 0, 0 ; 147
-	WRITE_COLOR r16, 1, 1, 1, 0 ; 160
-	WRITE_COLOR r16, 1, 0, 0, 1 ; 173
-	WRITE_COLOR r16, 1, 0, 1, 1 ; 186
-	WRITE_COLOR r16, 1, 1, 0, 1 ; 199
-	WRITE_COLOR r16, 1, 1, 1, 1 ; 212
-
-	WRITE_COLOR r16, 0, 0, 0, 0 ; 225
-	WRITE_COLOR r16, 0, 0, 1, 0 ; 238
-	WRITE_COLOR r16, 0, 1, 0, 0 ; 251
-	WRITE_COLOR r16, 0, 1, 1, 0 ; 264
-	WRITE_COLOR r16, 0, 0, 0, 1 ; 277
-	WRITE_COLOR r16, 0, 0, 1, 1 ; 290
-	WRITE_COLOR r16, 0, 1, 0, 1 ; 303
-	WRITE_COLOR r16, 0, 1, 1, 1 ; 316
-	WRITE_COLOR r16, 1, 0, 0, 0 ; 329
-	WRITE_COLOR r16, 1, 0, 1, 0 ; 342
-	WRITE_COLOR r16, 1, 1, 0, 0 ; 355
-	WRITE_COLOR r16, 1, 1, 1, 0 ; 368
-	WRITE_COLOR r16, 1, 0, 0, 1 ; 381
-	WRITE_COLOR r16, 1, 0, 1, 1 ; 394
-	WRITE_COLOR r16, 1, 1, 0, 1 ; 407
-
-    ; write last color with no hold
-    ldi r16, 0xff  ; 408
-    out COLOR_PORT, r16                               ; 409
-
-; END COLOR BAR TEST --------------------------------------
-
-    inc r17 ; 410
-
-    HOLD_3 send_color_data_final_color, r16, 3 ; 419
+	WRITE_TILE r31, r16, Z, r20 ; 16
+	WRITE_TILE r31, r16, Z, r21 ; 29    
+	WRITE_TILE r31, r16, Z, r20 ; 42
+	WRITE_TILE r31, r16, Z, r21 ; 55
+	WRITE_TILE r31, r16, Z, r20 ; 68
+	WRITE_TILE r31, r16, Z, r21 ; 81
+	WRITE_TILE r31, r16, Z, r20 ; 94
+	WRITE_TILE r31, r16, Z, r21 ; 107
+	WRITE_TILE r31, r16, Z, r20 ; 120
+	WRITE_TILE r31, r16, Z, r21 ; 133
+	WRITE_TILE r31, r16, Z, r20 ; 146
+	WRITE_TILE r31, r16, Z, r21 ; 159
+	WRITE_TILE r31, r16, Z, r20 ; 172
+	WRITE_TILE r31, r16, Z, r21 ; 185
+	WRITE_TILE r31, r16, Z, r20 ; 198
+	WRITE_TILE r31, r16, Z, r21 ; 211
+	WRITE_TILE r31, r16, Z, r20 ; 224
+	WRITE_TILE r31, r16, Z, r21 ; 237
+	WRITE_TILE r31, r16, Z, r20 ; 250
+	WRITE_TILE r31, r16, Z, r21 ; 263
+	WRITE_TILE r31, r16, Z, r20 ; 276
+	WRITE_TILE r31, r16, Z, r21 ; 289
+	WRITE_TILE r31, r16, Z, r20 ; 302
+	WRITE_TILE r31, r16, Z, r21 ; 315
+	WRITE_TILE r31, r16, Z, r20 ; 328
+	WRITE_TILE r31, r16, Z, r21 ; 341
+	WRITE_TILE r31, r16, Z, r20 ; 354
+	WRITE_TILE r31, r16, Z, r21 ; 367
+	WRITE_TILE r31, r16, Z, r20 ; 380
+	WRITE_TILE r31, r16, Z, r21 ; 393
+	WRITE_TILE r31, r16, Z, r20 ; 406
+	WRITE_TILE r31, r16, Z, r21 ; 419
 
     ; front porch   1.5uS (12 cycles)
     SYNC_PULSE r16, 1, 0            ; 420/1
-    out COLOR_PORT, r30  ; 2
- 
+
+    ;out COLOR_PORT, r30  ; 2       ; POSSIBLE BUG: do we need to send all black here?
+        nop ; 1
+        nop ; 2
+
     ; last visible line?
     cpi r17, 242            ; 3
     brne send_color_data_loop  ; 4 (5 if taken)

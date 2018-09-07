@@ -4,33 +4,17 @@
 ; Created: 3/5/2018 10:26:50 PM
 ; Author : trapper.mcferron
 ;
-.equ STACK_START	= 0x0060
-
-.equ COLOR_PORT		= PORTA
-.equ RED    		= PORTA0
-.equ GREEN_HI		= PORTA1
-.equ GREEN_LO		= PORTA2
-.equ BLUE           = PORTA3
-
 .equ VIDEO_PORT		= PORTD
 .equ HSYNC			= PORTD0
 .equ VSYNC			= PORTD1
 
-.MACRO WRITE_COLOR  ;need to take 13.15 cycles
-	ldi @0, (@1 << RED) | (@2 << GREEN_HI) | (@3 << GREEN_LO) | (@4 << BLUE)  ; 13 cycle
-    out COLOR_PORT, @0                                  ; 1
-    nop ;  2
-    nop ;  3
-    nop ;  4
-    nop ;  5
-    nop ;  6
-    nop ;  7
-    nop ;  8
-    nop ;  9
-    nop ;  10
-    nop ;  11
-    nop ;  12
-.ENDMACRO
+.equ SR_TOGGLE      = PORTC7
+
+.equ SCAN_BUFFER	= 0x1000
+.equ SR_RED     	= 0x0C00
+.equ SR_GRN_LO     	= 0x0C00
+.equ SR_GRN_HI     	= 0x0C00
+.equ SR_BLU     	= 0x0C00
 
 .macro SYNC_PULSE	;2 cycles
 	ldi @0, (@1 << HSYNC) | (@2 << VSYNC)
@@ -43,3 +27,35 @@
 	dec @1	        ;+1 cycle
 	brne @0			;+2 cycles if taken, -1 cycle when not taken (cancels out the ldi)
 .endmacro
+
+
+; tile format in bits:
+; R  R  R  R  R  R  R  R       (first byte red bits)
+; GL GL GL GL GL GL GL GL      (second byte green low bits)
+; GH GH GH GH GH GH GH GH      (third byte green hi bits)
+; B  B  B  B  B  B  B  B       (fourth byte blue bits)
+
+;R_GL_GH_B
+.macro WRITE_TILE   ;need to take 13.15 cycles
+	ldi @0, high(SCAN_BUFFER) | high(SR_RED) ;1 cycle
+    ld @1, @2+      ; write red - 3
+
+    ; (reset high bytes to activate next SR
+    ; low counter(r30) should stay at correct location
+	ldi @0, high(SCAN_BUFFER) | high(SR_GRN_LO) ;4 cycle 
+	ld @1, @2+      ; write green lo - 6
+
+	ldi @0, high(SCAN_BUFFER) | high(SR_GRN_HI) ;7 cycle
+	ld @1, @2+      ; write green hi - 9
+
+	ldi @0, high(SCAN_BUFFER) | high(SR_BLU) ;10 cycle
+	ld @1, @2+      ; write blue - 12
+
+	out SR_TOGGLE, @3   ; 13
+.endmacro
+
+;52.6 uS for a scanline
+;256 pixels = 0.20546875 uS per pixel
+;4.87mhz clock needed for SR
+
+

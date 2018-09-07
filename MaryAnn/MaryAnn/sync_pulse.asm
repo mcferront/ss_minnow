@@ -23,8 +23,10 @@ inv_sync_pulse:
 
     ; front porch   1.5uS (12 cycles)
     SYNC_PULSE r16, 0, 0  ; 420/1 cycles
-    out COLOR_PORT, r30  ; 2
- 
+    ;out COLOR_PORT, r30  ; 2       ; POSSIBLE BUG: do we need to send all black here?
+        nop ; 1
+        nop ; 2
+
     ; last visible line?
     cpi r17, 6 ;3
     breq inv_sync_pulse_done    ; 4 (5 if taken)
@@ -69,7 +71,9 @@ send_blank_lines:
 
     ; front porch   1.5uS (12 cycles)
     SYNC_PULSE r16, 1, 0            ; 420/1
-    out COLOR_PORT, r30  ; 2
+    ;out COLOR_PORT, r30  ; 2 ; POSSIBLE BUG: do we need to send all black here?
+        nop ; 1
+        nop ; 2
 
     cpi r17, 14                           ; 3
     breq send_blank_lines_done           ; 4 (5 if taken)
