@@ -8,7 +8,7 @@
 
 start:
 	cli
-    ldi r30, 0  ; constant always at 0
+    ldi r30, 0  ; Z registery low byte
 
 xmem_init:
     ldi r16, 1 << SRE
@@ -101,7 +101,7 @@ send_color_data_write_line:
 	; go...we have 52.6 uS 420.8 cycles
 	; for the visible data
 
-    nop ;1
+    ldi r30, 0  ;1  Z registery low byte
     nop ;2
     nop ;3
 
