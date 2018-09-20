@@ -10,12 +10,16 @@ start:
 	cli
     ldi r30, 0  ; Z registery low byte
 
+    ;SEND LED1
+
 xmem_init:
     ldi r16, 1 << SRE
     out MCUCR, r16
 
     ldi r16, (1 << XMM2) | (1 << XMM0)  //pc3+ open
     out XMBK, r16
+
+    ;SEND LED2
 
 pins_init:
     ; set sr toggle as output
@@ -26,19 +30,7 @@ pins_init:
 	ldi r16, (1 << DDD0) | (1 << DDD1)
 	out DDRD, r16
 
-    ; fill 128 bytes (4 bytes per tile, 32 tiles)
-fill_buffer:
-    ldi r31, high(SCAN_BUFFER)
-    ldi r17, 0xaa //0101 0101
-    ldi r16, 32
-
-fill_buffer_loop:
-    st Z+, r17  ; -> red
-    st Z+, r17  ; -> green hi
-    st Z+, r17  ; -> green lo
-    st Z+, r17  ; -> blue
-    dec r16
-    brne fill_buffer_loop
+    ;SEND LED3
 
 ; wait for go signal
 wait_for_go:
@@ -56,6 +48,25 @@ wait_for_go_loop:
     andi r16, (1 << PINB0)
     brne wait_for_go_loop   ; wait until it's held low
 
+    ;SEND LED4
+
+    ; fill 128 bytes (4 bytes per tile, 32 tiles)
+fill_buffer:
+    ldi r31, high(SCAN_BUFFER)
+    ldi r17, 0xaa //0101 0101
+    ldi r16, 32
+
+fill_buffer_loop:
+    st Z+, r17  ; -> red
+    st Z+, r17  ; -> green hi
+    st Z+, r17  ; -> green lo
+    st Z+, r17  ; -> blue
+    dec r16
+    brne fill_buffer_loop
+
+    ;SEND LED5
+
+prepare:
     ; 8Mhz = 8,000,000 cycles in a second
     ; each cycle = 1/8uS
     ; 8 cycles = 1uS
@@ -67,8 +78,7 @@ wait_for_go_loop:
     ldi r20, 0  ; buffer a
     ldi r21, 1  ; buffer b
 
-    ; send vsync to prof
-    SYNC_PULSE r16, 0, 1
+    SYNC_PULSE r16, 0, 1              
 
 main_loop:
     rjmp inv_sync_pulse                ;6 lines

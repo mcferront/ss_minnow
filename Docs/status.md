@@ -15,16 +15,8 @@ voltage divider: v * r2 / (r1 + r2)
 next steps
 ----
    Mary Ann with a single shift register
-      incoming/outgoing port with Island (include HBLANK return)
-      order parts
-         +latch
-         +RAM
-         *4.8mhz clk
-         *2 nands
-         *2 shift registers
-         +bus switch
-      
-      breadboard
+      Add LED status lights to gfx startup
+   
    
    Document Ocean pipeline + specs
    Breadboard Mary Ann
