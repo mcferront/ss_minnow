@@ -9,8 +9,11 @@
 start:
 	cli
     ldi r30, 0  ; Z registery low byte
+    ldi r18, 0  ; store black
 
-    ;SEND LED1
+    ; set pb1,2,3 as output
+	ldi r16, (1 << DDB1) | (1 << DDB2) | (1 << DDB3)
+	out DDRB, r16
 
 xmem_init:
     ldi r16, 1 << SRE
@@ -19,27 +22,23 @@ xmem_init:
     ldi r16, (1 << XMM2) | (1 << XMM0)  //pc3+ open
     out XMBK, r16
 
-    ;SEND LED2
-
 pins_init:
     ; set sr toggle as output
 	ldi r16, (1 << DDC7)
-	out DDRD, r16
+	out DDRC, r16
 
 	; set hsync/prof vsync as output
 	ldi r16, (1 << DDD0) | (1 << DDD1)
 	out DDRD, r16
 
-    ;SEND LED3
+    ;SEND LED1
+    ldi r16, (1 << PORTB1)
+    out PORTB, r16
 
 ; wait for go signal
 wait_for_go:
-    ; input direction
-    ldi r16, 0 
-    out DDRB, r16
-
-    ; pull up resistor 
-    ldi r16, 1 << PORTB0
+    ; pull up resistor + LED1
+    ldi r16, (1 << PORTB0) | (1 << PORTB1)
     out PORTB, r16
 
 ; wait loop
@@ -48,7 +47,9 @@ wait_for_go_loop:
     andi r16, (1 << PINB0)
     brne wait_for_go_loop   ; wait until it's held low
 
-    ;SEND LED4
+    ;SEND LED2 + b0 pull up resistor
+    ldi r16, (1 << PORTB0) | (1 << PORTB1) | (1 << PORTB2)
+    out PORTB, r16
 
     ; fill 128 bytes (4 bytes per tile, 32 tiles)
 fill_buffer:
@@ -64,7 +65,16 @@ fill_buffer_loop:
     dec r16
     brne fill_buffer_loop
 
-    ;SEND LED5
+    ; fill last byte with all black
+    ldi r17, 0x0
+    st Z+, r17
+
+    ; set Y register low to ref this point
+    ldi r28, 128
+
+    ;SEND LED3 + b0 pull up resistor
+    ldi r16, (1 << PORTB0) | (1 << PORTB1) | (1 << PORTB2) | (1 << PORTB3)
+    out PORTB, r16
 
 prepare:
     ; 8Mhz = 8,000,000 cycles in a second
@@ -146,28 +156,27 @@ send_color_data_write_line:
 	WRITE_TILE r31, r16, Z, r20 ; 380
 	WRITE_TILE r31, r16, Z, r21 ; 393
 	WRITE_TILE r31, r16, Z, r20 ; 406
-	WRITE_TILE r31, r16, Z, r21 ; 419
+	
+    WRITE_BLACK r29, r16, Y, r21 ; 419
 
     ; front porch   1.5uS (12 cycles)
     SYNC_PULSE r16, 1, 0            ; 420/1
 
     ;out COLOR_PORT, r30  ; 2       ; POSSIBLE BUG: do we need to send all black here?
-        nop ; 1
         nop ; 2
 
     ; last visible line?
-    cpi r17, 242            ; 3
-    brne send_color_data_loop  ; 4 (5 if taken)
-    
-    ldi r17, 0  ; 5
-    SYNC_PULSE r16, 1, 1            ; 7
+    inc r17                 ; 3
 
-    nop ; 8
+    cpi r17, 242            ; 4
+    brne send_color_data_loop  ; 5 (6 if taken)
+    
+    ldi r17, 0  ; 6
+    SYNC_PULSE r16, 1, 1            ; 8
 
     rjmp main_loop  ; 10 (12 for the rjmp to get here)
     
 send_color_data_loop:
-    nop ; 6
     nop ; 7
     nop ; 8
     nop ; 9

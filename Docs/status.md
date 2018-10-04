@@ -1,5 +1,6 @@
-Mistake 1: gfx port on vsync was wired to clk
-Mistake 2: need a reset pin from prof to gfx - hold high until ready to go
+Mistake: gfx port on vsync was wired to clk
+Mistake: need a reset pin from prof to gfx - hold high until ready to go
+Mistake: select pin on color generator board (ad724) should always be low [fsc mode]
 
 5v -> .714v for RIN,BIN
    R1=2k, R2=330
@@ -15,8 +16,14 @@ voltage divider: v * r2 / (r1 + r2)
 next steps
 ----
    Mary Ann with a single shift register
-      Add LED status lights to gfx startup
-   
+      for now we're forcing black on last tile
+         get shift reg path working
+      ld from xram takes 1 addition cycle
+         right now we only have time for 3 bit color
+      color pins must be at black level during horiz blanking
+         make sure last pixel of each line is black
+         maybe 31 tiles, with last tile (32) being all black
+      
    
    Document Ocean pipeline + specs
    Breadboard Mary Ann
