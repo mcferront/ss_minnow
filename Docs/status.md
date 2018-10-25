@@ -16,6 +16,10 @@ voltage divider: v * r2 / (r1 + r2)
 next steps
 ----
    Mary Ann with a single shift register
+      schematic pull up resistors on each NAND output
+      
+      why is pulse freaking out on SR every other line?  this could be the issue
+      
       for now we're forcing black on last tile
          get shift reg path working
       ld from xram takes 1 addition cycle
@@ -23,6 +27,7 @@ next steps
       color pins must be at black level during horiz blanking
          make sure last pixel of each line is black
          maybe 31 tiles, with last tile (32) being all black
+
       
    
    Document Ocean pipeline + specs
@@ -55,6 +60,7 @@ http://www.nteinc.com/specs/7400to7499/pdf/nte74s00.pdf
 http://www.mouser.com/ds/2/3/aco-514121.pdf
 adz24: https://www.digikey.com/product-detail/en/analog-devices-inc/ad724jrz/ad724jrz-nd/653959
 3.58mhz clock https://www.digikey.com/scripts/dksearch/dksus.dll?detail&itemseq=262437742&uq=636633277738425485
+4.9152MHz clock http://www.ctscorp.com/wp-content/uploads/MXO45.pdf
 
 
 parts

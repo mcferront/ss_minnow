@@ -10,7 +10,7 @@
 
 .equ SR_TOGGLE      = PORTC7
 
-.equ SCAN_BUFFER	= 0x1000
+.equ SCAN_BUFFER	= 0x0800
 .equ SR_RED     	= 0x0C00
 .equ SR_GRN_LO     	= 0x0C00
 .equ SR_GRN_HI     	= 0x0C00
@@ -28,6 +28,17 @@
 	brne @0			;+2 cycles if taken, -1 cycle when not taken (cancels out the ldi)
 .endmacro
 
+
+; can I read 128 bytes during an hsync?
+; ld .. 3 cycles
+; st to internal ... 2 cycles
+; 5 cycles per byte: 640cycles
+; we should have enough time between inv_sync and send_blank_lines
+
+; but what about writing it out?
+; ld  - 2 cycle - 8 bits red
+; out - 1 cycle - activate red
+; out - 1 cycle - red data
 
 ; tile format in bits:
 ; R  R  R  R  R  R  R  R       (first byte red bits)
@@ -52,7 +63,7 @@
     ;ld @1, Z+      ; write blue - 12
 
 
-	out SR_TOGGLE, @3   ; 13
+	out PORTC, @3   ; 13
 .endmacro
 
 .macro WRITE_BLACK  ;need to take 13.15 cycles
@@ -71,7 +82,7 @@
     ;ld @1, Z+      ; write blue - 12
 
 
-	out SR_TOGGLE, @3   ; 13
+	out PORTC, @3       ; 13
 .endmacro
 
 ;52.6 uS for a scanline

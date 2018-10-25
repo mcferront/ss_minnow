@@ -19,8 +19,8 @@ xmem_init:
     ldi r16, 1 << SRE
     out MCUCR, r16
 
-    ldi r16, (1 << XMM2) | (1 << XMM0)  //pc3+ open
-    out XMBK, r16
+    ldi r16, (1 << XMM2) //pc4+ open
+    out SFIOR, r16
 
 pins_init:
     ; set sr toggle as output
@@ -51,26 +51,38 @@ wait_for_go_loop:
     ldi r16, (1 << PORTB0) | (1 << PORTB1) | (1 << PORTB2)
     out PORTB, r16
 
-    ; fill 128 bytes (4 bytes per tile, 32 tiles)
-fill_buffer:
+    ; fill 93 bytes (3 bytes per tile, 31 tiles)
+fill_buffer_line_1:
     ldi r31, high(SCAN_BUFFER)
-    ldi r17, 0xaa //0101 0101
-    ldi r16, 32
+    ldi r17, 0x55 //0101 0101
+    ldi r16, 31 ; 31 tiles
 
-fill_buffer_loop:
+fill_buffer_loop_line_1:
     st Z+, r17  ; -> red
-    st Z+, r17  ; -> green hi
-    st Z+, r17  ; -> green lo
+    st Z+, r17  ; -> green
     st Z+, r17  ; -> blue
     dec r16
-    brne fill_buffer_loop
+    brne fill_buffer_loop_line_1
+
+    ; fill 93 bytes (3 bytes per tile, 31 tiles)
+fill_buffer_line_2:
+    ldi r31, high(SCAN_BUFFER)
+    ldi r17, 0xaa //1010 1010
+    ldi r16, 31 ; 31 tiles
+
+fill_buffer_loop_line_2:
+    st Z+, r17  ; -> red
+    st Z+, r17  ; -> green
+    st Z+, r17  ; -> blue
+    dec r16
+    brne fill_buffer_loop_line_2
 
     ; fill last byte with all black
     ldi r17, 0x0
     st Z+, r17
 
     ; set Y register low to ref this point
-    ldi r28, 128
+    ldi r28, 186    ;(93 + 93)
 
     ;SEND LED3 + b0 pull up resistor
     ldi r16, (1 << PORTB0) | (1 << PORTB1) | (1 << PORTB2) | (1 << PORTB3)
@@ -85,8 +97,8 @@ prepare:
     ; prime registers
     ldi r17, 0  ; line count
 
-    ldi r20, 0  ; buffer a
-    ldi r21, 1  ; buffer b
+    ldi r20, (0 << SR_TOGGLE)  ; buffer a
+    ldi r21, (1 << SR_TOGGLE)  ; buffer b
 
     SYNC_PULSE r16, 0, 1              
 
@@ -115,16 +127,24 @@ send_color_data:
     HOLD_3 send_color_data_color_burst, r16, 12  ; 36   
 
     nop ;37
-    nop ;38
+    ;nop ;38
+
+    ldi r16, 1 ;38
 
 send_color_data_write_line:
 	; go...we have 52.6 uS 420.8 cycles
 	; for the visible data
 
-    ldi r30, 0  ;1  Z registery low byte
-    nop ;2
-    nop ;3
+send_color_data_write_line_set_z:
+    
+    and r16, r17    ; 1 <- r16 preloaded with a 1 right before this loop is called
 
+    brne send_color_data_write_line_set_z_push_data ; 2/3 odd line? don't reset the counter
+    ldi r30, 0 ;3
+
+    ;nop ;2
+    ;nop ;3
+send_color_data_write_line_set_z_push_data:
 	WRITE_TILE r31, r16, Z, r20 ; 16
 	WRITE_TILE r31, r16, Z, r21 ; 29    
 	WRITE_TILE r31, r16, Z, r20 ; 42
@@ -164,6 +184,7 @@ send_color_data_write_line:
 
     ;out COLOR_PORT, r30  ; 2       ; POSSIBLE BUG: do we need to send all black here?
         nop ; 2
+
 
     ; last visible line?
     inc r17                 ; 3
