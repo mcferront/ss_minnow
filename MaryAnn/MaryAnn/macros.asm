@@ -47,7 +47,7 @@
 ; B  B  B  B  B  B  B  B       (fourth byte blue bits)
 
 ;R_GL_GH_B
-.macro WRITE_TILE   ;need to take 13.15 cycles
+.macro PRIME_TILE   ;need to take 12.15 cycles
 	ldi @0, high(SCAN_BUFFER) | high(SR_RED) ;1 cycle
     ld @1, @2+      ; write red - 4
     
@@ -61,10 +61,56 @@
 
 	;ldi @0, high(SCAN_BUFFER) | high(SR_BLU) ;10 cycle
     ;ld @1, Z+      ; write blue - 12
+.endmacro
+
+.macro LOAD_TILE   ;need to take 13.15 cycles
+	ldi @0, high(SCAN_BUFFER) | high(SR_RED) ;1 cycle
+    ld @1, @2+      ; write red - 4
+    
+    ; (reset high bytes to activate next SR
+    ; low counter(r30) should stay at correct location
+	ldi @0, high(SCAN_BUFFER) | high(SR_GRN_LO) ;5 cycle 
+	ld @1, @2+      ; write green lo - 8
+
+	ldi @0, high(SCAN_BUFFER) | high(SR_GRN_HI) ;9 cycle
+	ld @1, @2+      ; write green hi - 12
+
+	;ldi @0, high(SCAN_BUFFER) | high(SR_BLU) ;10 cycle
+    ;ld @1, Z+      ; write blue - 12
 
 
 	out PORTC, @3   ; 13
 .endmacro
+
+.macro LOAD_TILE2   ;need to take 13.15 cycles
+    ld @1, @2+      ;2
+	out PORTB, r18  ;3 shift reg on
+    out PORTC, @1   ;4  output data
+        
+    ld @1, @2+      ;6
+	out PORTB, r18  ;7 shift reg on
+    out PORTC, @1   ;8  output data
+
+    ld @1, @2+      ;10
+	out PORTB, r18  ;11 shift reg on
+    out PORTC, @1   ;12  output data
+
+
+    ; (reset high bytes to activate next SR
+    ; low counter(r30) should stay at correct location
+	;ldi @0, high(SCAN_BUFFER) | high(SR_GRN_LO) ;5 cycle 
+	;ld @1, @2+      ; write green lo - 8
+
+	;ldi @0, high(SCAN_BUFFER) | high(SR_GRN_HI) ;9 cycle
+	;ld @1, @2+      ; write green hi - 12
+
+	;ldi @0, high(SCAN_BUFFER) | high(SR_BLU) ;10 cycle
+    ;ld @1, Z+      ; write blue - 12
+
+
+	out PORTC, @3   ; 13
+.endmacro
+
 
 .macro WRITE_BLACK  ;need to take 13.15 cycles
 	ldi @0, high(SCAN_BUFFER) | high(SR_RED) ;1 cycle
@@ -73,10 +119,10 @@
     ; (reset high bytes to activate next SR
     ; low counter(r30) should stay at correct location
 	ldi @0, high(SCAN_BUFFER) | high(SR_GRN_LO) ;5 cycle 
-    ld @1, @2      ; write green lo - 8
+	ld @1, @2      ; write green lo - 8
 
 	ldi @0, high(SCAN_BUFFER) | high(SR_GRN_HI) ;9 cycle
-    ld @1, @2      ; write green hi - 12
+	ld @1, @2      ; write green hi - 12
 
 	;ldi @0, high(SCAN_BUFFER) | high(SR_BLU) ;10 cycle
     ;ld @1, Z+      ; write blue - 12

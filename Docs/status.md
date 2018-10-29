@@ -18,7 +18,27 @@ next steps
    Mary Ann with a single shift register
       schematic pull up resistors on each NAND output
       
-      why is pulse freaking out on SR every other line?  this could be the issue
+      I think it will work if we combine
+         ALE low, RD low, A10 high
+      
+      
+      or remove ALE/A10
+         ALE low
+         A10 high
+
+         ALE high
+         A10 high
+         
+         inv ALE
+         inv (a10 && ale)
+
+      use internal mem to write out manually through a port
+      test with xmem disabled and all black
+      PORTB could be our data out port for shift registers
+      sr_0 still goes high
+      
+      
+      
       
       for now we're forcing black on last tile
          get shift reg path working
