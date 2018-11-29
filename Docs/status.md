@@ -16,39 +16,9 @@ voltage divider: v * r2 / (r1 + r2)
 next steps
 ----
    Mary Ann with a single shift register
-      schematic pull up resistors on each NAND output
-      
-      I think it will work if we combine
-         ALE low, RD low, A10 high
-      
-      
-      or remove ALE/A10
-         ALE low
-         A10 high
-
-         ALE high
-         A10 high
-         
-         inv ALE
-         inv (a10 && ale)
-
-      use internal mem to write out manually through a port
-      test with xmem disabled and all black
-      PORTB could be our data out port for shift registers
-      sr_0 still goes high
-      
-      
-      
-      
-      for now we're forcing black on last tile
-         get shift reg path working
-      ld from xram takes 1 addition cycle
-         right now we only have time for 3 bit color
-      color pins must be at black level during horiz blanking
-         make sure last pixel of each line is black
-         maybe 31 tiles, with last tile (32) being all black
-
-      
+      sr clock hooked to 8mhz for sanity
+      why is color not outputting correctly?
+         ideally clk is pulled low while PL is low
    
    Document Ocean pipeline + specs
    Breadboard Mary Ann

@@ -9,7 +9,7 @@ inv_sync_pulse:
     nop ;37
     nop ;38
 
-    ; visible scan line data + front porch + backporc: 57uS (456 cycles)
+    ; visible scan line data + front porch + backporch: 58uS (~464 cycles)
     SYNC_PULSE r16, 0, 0          ; 40
 
     inc r17     ; 1
@@ -17,7 +17,6 @@ inv_sync_pulse:
     HOLD_3 inv_sync_pulse_loop_line, r16, 148  ; 445
 
 
-    ;out COLOR_PORT, r30  ; 2       ; POSSIBLE BUG: do we need to send all black here?
     nop ; 446
     nop ; 447
 
@@ -33,7 +32,12 @@ inv_sync_pulse:
     nop ; 454
     nop ; 455
 
-    rjmp inv_sync_pulse         ; 457
+    nop ; 456   these make it go over our calculated 456
+    nop ; 457
+    nop ; 458
+    nop ; 459
+
+    rjmp inv_sync_pulse         ; 461
 
 inv_sync_pulse_done:
 
@@ -65,7 +69,6 @@ send_blank_lines:
 
     ; front porch   1.5uS (12 cycles)
     SYNC_PULSE r16, 1, 0            ; 420/1
-    ;out COLOR_PORT, r30  ; 2 ; POSSIBLE BUG: do we need to send all black here?
 
     nop ; 2
 
