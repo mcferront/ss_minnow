@@ -17,8 +17,10 @@ next steps
 ----
    Mary Ann with a single shift register
       sr clock hooked to 8mhz for sanity
-      why is color not outputting correctly?
-         ideally clk is pulled low while PL is low
+      color D7 goes to Q7 when PL is low
+      causing the first loaded color to hold longer
+      i think the imprecise timing of this causes the pixel flicker
+      how does NES do it?
    
    Document Ocean pipeline + specs
    Breadboard Mary Ann

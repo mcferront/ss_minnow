@@ -8,6 +8,7 @@
 .equ HSYNC			= PORTD0
 .equ VSYNC			= PORTD1
 
+.equ SR_SEL         = PORTC6
 .equ SR_PL          = PORTC7
 
 .equ SCAN_BUFFER	= 0x0800
@@ -86,5 +87,3 @@
 ;52.6 uS for a scanline
 ;256 pixels = 0.20546875 uS per pixel
 ;4.87mhz clock needed for SR
-
-

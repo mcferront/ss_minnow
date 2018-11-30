@@ -21,8 +21,8 @@ xmem_init:
     out SFIOR, r16
 
 pins_init:
-    ; set sr toggle as output
-	ldi r16, (1 << DDC7)
+    ; set SR_PL and SR_SEL as output
+	ldi r16, (1 << DDC7) | (1 << DDC6)
 	out DDRC, r16
 
 	; set hsync/prof vsync as output
@@ -54,9 +54,9 @@ wait_for_go_loop:
 
 fill_buffer_line_1:
     ldi r31, high(SCAN_BUFFER)
-    ldi r17, 0x55 ;0101 0101
-    ldi r16, 32 ; 30 tiles
-
+    ldi r17, 0x11; 0001 0001 ;0x55 ;0101 0101
+    ldi r16, 30 ; 30 tiles
+    
 fill_buffer_loop_line_1:
     st Z+, r17  ; -> red
     st Z+, r17  ; -> green
@@ -64,12 +64,10 @@ fill_buffer_loop_line_1:
     dec r16
     brne fill_buffer_loop_line_1
 
-    rjmp prepare
-
     ; fill 30 tiles
 fill_buffer_line_2:
     ldi r31, high(SCAN_BUFFER)
-    ldi r17, 0xaa   ;1010 1010 
+    ldi r17, 0x88; 1000 1000; 0xaa   ;1010 1010 
     ldi r16, 30 ; 30 tiles
 
 fill_buffer_loop_line_2:
@@ -92,10 +90,17 @@ prepare:
     ; prime registers
     ldi r17, 0  ; line count0
 
-    ldi r20, (0 << SR_PL)  ; pull low to load
-    ldi r21, (1 << SR_PL)  ; pull high
+    ; SEL low (SR1 color outputting, SR2 color loading)
+    ; SEL high (SR2 color outputting, SR1 color loading)
 
-	out PORTC, r20   ; SR1 start outputting
+    ldi r20, (0 << SR_PL)  | (0 << SR_SEL);  pull low to load
+    ldi r21, (1 << SR_PL)  | (0 << SR_SEL);  pull high
+    
+    ldi r22, (0 << SR_PL)  | (1 << SR_SEL);  pull low to load
+    ldi r23, (1 << SR_PL)  | (1 << SR_SEL);  pull high
+    
+    ; set PL to high SR1 to load
+	out PORTC, r23
 
     ldi r30, 0 ;6
     PRIME_TILE r31, r16, Z+  ; tile 0
@@ -114,99 +119,94 @@ main_loop_send_blank_lines_done:
 
 
 send_color_data:
-    ; sync pulse: hold low for 4.7uS (~37.6 cycles) 
+    ; sync pulse: hold low for 4.7uS (~37.6 cycles)
     SYNC_PULSE r16, 0, 0        ; 2 cycles
 
-    ldi r16, 1 ;3
-    and r16, r17    ; 4
+    nop ;3
 
-    brne send_color_data_skip_z_clear ; 5/6 odd line? don't reset the counter
-    nop ;5
+HOLD_3 send_color_data_back_porch, r16, 0x0b   ; 36
 
-    ldi r30, 0 ;6
-
-send_color_data_skip_z_clear:
-    
-    HOLD_3 send_color_data_back_porch, r16, 0x09   ; 33
-
-    nop ;34
-    nop ;35
-    nop ;36
     nop ;37
-    nop ;38
+    nop ;x round
+
     ; backporch/prime color burst
-    SYNC_PULSE r16, 1, 0           ; 2
+    SYNC_PULSE r16, 1, 0           ; 1/2
 
-    ; color burst: hold high for ~4.7uS (~37.6 cycles)
-    HOLD_3 send_color_data_color_burst, r16, 11  ; 35
+    ; breezeway+color burst+backporch: hold high for ~4.7uS (~37.6 cycles)
+    HOLD_3 send_color_data_color_burst, r16, 0x0b  ; 35
 
-    ;nop ; 36
-    out PORTC, r20             ; 36
-    out PORTC, r21             ; 37 [output tile 0]
+    nop ;36
+
+    ; toggle PL and then output SR1 color, set SR2 to load
+    out PORTC, r22             ; 37
+    out PORTC, r21             ; 37 ~.8 [output tile 0]
 
 send_color_data_write_line:
-	; go...we have 52.6 uS 420.8 cycles
+	; go...we have 52.6 uS 420.8 cycles for color data and 1.5us for front porch = 432.8 total
 	; for the visible data
-
-send_color_data_write_line_set_z:
-
-
-send_color_data_write_line_set_z_push_data:
-
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 14 [tile 0 is rendering | load tile 1]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 28 [tile 1 is rendering | load tile 2]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 42 [tile 2 is rendering | load tile 3]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 56 [tile 3 is rendering | load tile 4]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 70 [tile 4 is rendering | load tile 5]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 84 [tile 5 is rendering | load tile 6]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 98 [tile 6 is rendering | load tile 7]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 112 [tile 7 is rendering | load tile 8]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 126 [tile 8 is rendering | load tile 9]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 140 [tile 9 is rendering | load tile 10]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 154 [tile 10 is rendering | load tile 11]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 168 [tile 11 is rendering | load tile 12]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 182 [tile 12 is rendering | load tile 13]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 196 [tile 13 is rendering | load tile 14]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 210 [tile 14 is rendering | load tile 15]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 224 [tile 15 is rendering | load tile 16]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 238 [tile 16 is rendering | load tile 17]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 252 [tile 17 is rendering | load tile 18]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 266 [tile 18 is rendering | load tile 19]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 280 [tile 19 is rendering | load tile 20]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 294 [tile 20 is rendering | load tile 21]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 308 [tile 21 is rendering | load tile 22]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 322 [tile 22 is rendering | load tile 23]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 336 [tile 23 is rendering | load tile 24]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 350 [tile 24 is rendering | load tile 25]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 364 [tile 25 is rendering | load tile 26]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 378 [tile 26 is rendering | load tile 27]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 392 [tile 27 is rendering | load tile 28]
-	LOAD_TILE r31, r16, Z+, r20, r21 ; 406 [tile 28 is rendering | load tile 29]
+	LOAD_TILE r31, r16, Z+, r20, r23 ; 14 [tile 0 is rendering | load tile 1] (output sr2, sr1 load)
+	LOAD_TILE r31, r16, Z+, r22, r21 ; 28 [tile 1 is rendering | load tile 2] (output sr1, sr2 load)
+	LOAD_TILE r31, r16, Z+, r20, r23 ; 42 [tile 2 is rendering | load tile 3]
+	LOAD_TILE r31, r16, Z+, r22, r21 ; 56 [tile 3 is rendering | load tile 4]
+	LOAD_TILE r31, r16, Z+, r20, r23 ; 70 [tile 4 is rendering | load tile 5]
+	LOAD_TILE r31, r16, Z+, r22, r21 ; 84 [tile 5 is rendering | load tile 6]
+	LOAD_TILE r31, r16, Z+, r20, r23 ; 98 [tile 6 is rendering | load tile 7]
+	LOAD_TILE r31, r16, Z+, r22, r21 ; 112 [tile 7 is rendering | load tile 8]
+	LOAD_TILE r31, r16, Z+, r20, r23 ; 126 [tile 8 is rendering | load tile 9]
+	LOAD_TILE r31, r16, Z+, r22, r21 ; 140 [tile 9 is rendering | load tile 10]
+	LOAD_TILE r31, r16, Z+, r20, r23 ; 154 [tile 10 is rendering | load tile 11]
+	LOAD_TILE r31, r16, Z+, r22, r21 ; 168 [tile 11 is rendering | load tile 12]
+	LOAD_TILE r31, r16, Z+, r20, r23 ; 182 [tile 12 is rendering | load tile 13]
+	LOAD_TILE r31, r16, Z+, r22, r21 ; 196 [tile 13 is rendering | load tile 14]
+	LOAD_TILE r31, r16, Z+, r20, r23 ; 210 [tile 14 is rendering | load tile 15]
+	LOAD_TILE r31, r16, Z+, r22, r21 ; 224 [tile 15 is rendering | load tile 16]
+	LOAD_TILE r31, r16, Z+, r20, r23 ; 238 [tile 16 is rendering | load tile 17]
+	LOAD_TILE r31, r16, Z+, r22, r21 ; 252 [tile 17 is rendering | load tile 18]
+	LOAD_TILE r31, r16, Z+, r20, r23 ; 266 [tile 18 is rendering | load tile 19]
+	LOAD_TILE r31, r16, Z+, r22, r21 ; 280 [tile 19 is rendering | load tile 20]
+	LOAD_TILE r31, r16, Z+, r20, r23 ; 294 [tile 20 is rendering | load tile 21]
+	LOAD_TILE r31, r16, Z+, r22, r21 ; 308 [tile 21 is rendering | load tile 22]
+	LOAD_TILE r31, r16, Z+, r20, r23 ; 322 [tile 22 is rendering | load tile 23]
+	LOAD_TILE r31, r16, Z+, r22, r21 ; 336 [tile 23 is rendering | load tile 24]
+	LOAD_TILE r31, r16, Z+, r20, r23 ; 350 [tile 24 is rendering | load tile 25]
+	LOAD_TILE r31, r16, Z+, r22, r21 ; 364 [tile 25 is rendering | load tile 26]
+	LOAD_TILE r31, r16, Z+, r20, r23 ; 378 [tile 26 is rendering | load tile 27]
+	LOAD_TILE r31, r16, Z+, r22, r21 ; 392 [tile 27 is rendering | load tile 28]
+	LOAD_TILE r31, r16, Z+, r20, r23 ; 406 [tile 28 is rendering | load tile 29] (output sr2, sr1 load)
 	
     ;LOAD_TILE r31, r16, Z+, r20, r21 ; 420 [tile 29 is rendering | load tile 30]
 	;LOAD_TILE r31, r16, Z+, r20, r21 ; 434 [tile 30 is rendering | load tile 31]
 
-	PRIME_TILE r31, r16, Z+     ; 420 [tile 29 is rendering | prime tile 0]
+    
+    ldi r16, 1 ;407
+    and r16, r17    ; 408
 
-    ; front porch   1.5uS (12 cycles.. 9 cycles, allowing for 3 roll over to start the sync pulse)
-    SYNC_PULSE r16, 1, 0            ; 1/2
+    breq send_color_data_skip_z_clear ; 409/410 odd line? reset the counter
 
+    ldi r30, 0 ;410
+
+ send_color_data_skip_z_clear:
+	PRIME_TILE r31, r16, Z+     ; 422 [tile 29 is rendering | prime tile 0] (loading into sr1)
+
+    ; pulse is already high no need to send front porch
+    nop ;423
 
     ; last visible line?
-    inc r17                 ; 3
+    inc r17                 ; 424
 
-    cpi r17, 242            ; 4
-    brne send_color_data_loop  ; 5 (6 if taken)
+    cpi r17, 242            ; 425
+    brne send_color_data_loop  ; 426 (427 if taken)
+
+    ldi r17, 0  ; 427
+    nop ;428
     
-    ldi r17, 0  ; 6
-    SYNC_PULSE r16, 1, 1            ; 8
-
-    rjmp main_loop  ; 10 (12 for the rjmp to get here)
+    rjmp main_loop  ; 430 ; allow 2 for main to rjmp
     
 send_color_data_loop:
-    nop ; 7
-
-    rjmp send_color_data         ; 9
+    nop ;428
+    nop ;429
+    nop ;430
+    rjmp send_color_data         ; 432
 
 
     
